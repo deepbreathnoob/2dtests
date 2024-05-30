@@ -1,10 +1,12 @@
 extends CharacterBody2D
 
 const SPEED = 100.0
+@export var health: int = 0
 var current_direction = "none"
 
 func _physics_process(delta):
 	player_movement(delta)
+	handleCollision()
 	
 func player_movement(delta):
 	if Input.is_action_pressed("ui_right"):
@@ -34,6 +36,12 @@ func player_movement(delta):
 		current_direction = "idle"
 
 	move_and_slide()
+
+func handleCollision():
+	for collision_count in get_slide_collision_count():
+		var collision = get_slide_collision(collision_count)
+		var collider = collision.get_collider()
+		print_debug(collider.name)
 
 func play_anim(movement):
 	var dir = current_direction
