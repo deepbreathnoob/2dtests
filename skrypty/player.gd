@@ -1,10 +1,21 @@
 extends CharacterBody2D
 
 const SPEED = 100.0
+@export var health: int = 20
 var current_direction = "none"
+var dmg = 0
+
+
+var enemy_in_attack_range = false
+var enemy_attack_coldown = true
+var player_alive = true
+
+
 
 func _physics_process(delta):
 	player_movement(delta)
+	takeDamage(dmg)
+	handleCollision()
 	
 func player_movement(delta):
 	if Input.is_action_pressed("ui_right"):
@@ -35,6 +46,24 @@ func player_movement(delta):
 
 	move_and_slide()
 
+func handleCollision():
+	for collision_count in get_slide_collision_count():
+		var collision = get_slide_collision(collision_count)
+		var collider = collision.get_collider()
+		#print_debug(collider.name)
+
+func takeDamage(damage: int):
+	if enemy_attack_coldown == true and enemy_in_attack_range == true:
+		health = health - damage
+		enemy_attack_coldown = false
+		$attack_coldown.start()
+		print(health)
+	if health <= 0:
+		player_alive = false
+		print("You are died!!")
+		health = 0
+
+
 func play_anim(movement):
 	var dir = current_direction
 	var anim = $AnimatedSprite2D
@@ -62,3 +91,20 @@ func play_anim(movement):
 			anim.play("run_down")
 		elif movement == 0:
 			anim.play("idle_down")
+
+func _on_player_hitbox_body_entered(body):
+	if body.has_method("enemy"):
+		enemy_in_attack_range = true
+
+
+func _on_player_hitbox_body_exited(body):
+	if body.has_method("enemy"):
+		enemy_in_attack_range = false
+		dmg = body.damage
+		
+		
+func player():
+	pass
+
+func _on_attack_coldown_timeout():
+	enemy_attack_coldown = true
