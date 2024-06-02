@@ -4,6 +4,7 @@ var run_speed = 25
 @export var player: Node2D
 @onready var nav_agent := $NavigationAgent2D as NavigationAgent2D
 
+@export var damage: int = 1
 
 
 
@@ -28,3 +29,6 @@ func _on_detection_area_body_entered(body):
 
 func _on_detection_area_body_exited(body):
 	player = null
+	
+func enemy():
+	pass
